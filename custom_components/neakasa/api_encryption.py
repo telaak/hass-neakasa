@@ -1,50 +1,56 @@
-from Cryptodome.Cipher import AES
 from base64 import b64encode, b64decode
 import time
 
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
 from .const import AES_KEY_DEFAULT, AES_IV_DEFAULT
+
 
 class APIEncryption:
     def __init__(self):
         self.resetEncryption()
 
     def resetEncryption(self):
-        self.aes_key = AES_KEY_DEFAULT
-        self.aes_iv = AES_IV_DEFAULT
+        self.aes_key = AES_KEY_DEFAULT   # must be 16/24/32 bytes
+        self.aes_iv = AES_IV_DEFAULT     # must be 16 bytes
+        self._token = ""                 # ensure defined
 
-    async def _pad(self, data):
-        """NoPadding-compatible: manually fill up to block size 16 with zero bytes"""
+    async def _pad(self, data: bytes) -> bytes:
+        """Manual zero padding to 16-byte blocks (matches your NoPadding approach)."""
         block_size = 16
-        pad_len = block_size - (len(data) % block_size)
-        return data + b'\x00' * pad_len if pad_len != 0 else data
+        pad_len = (-len(data)) % block_size
+        return data if pad_len == 0 else data + (b"\x00" * pad_len)
 
-    async def _unpad(self, data):
-        """Removes null bytes at the end - not entirely safe, but how NoPadding texts are often handled"""
-        return data.rstrip(b'\x00')
+    async def _unpad(self, data: bytes) -> bytes:
+        """Strip trailing nulls (⚠️ be aware this can lose intentional trailing zeros)."""
+        return data.rstrip(b"\x00")
 
-    async def encrypt(self, plain_text):
-        cipher = AES.new(self.aes_key, AES.MODE_CBC, self.aes_iv)
-        padded = await self._pad(plain_text.encode('utf-8'))
-        encrypted = cipher.encrypt(padded)
-        return b64encode(encrypted).decode('utf-8')
+    async def encrypt(self, plain_text: str) -> str:
+        cipher = Cipher(algorithms.AES(self.aes_key), modes.CBC(self.aes_iv))
+        encryptor = cipher.encryptor()
+        padded = await self._pad(plain_text.encode("utf-8"))
+        ct = encryptor.update(padded) + encryptor.finalize()
+        return b64encode(ct).decode("utf-8")
 
-    async def decrypt(self, encrypted_text):
-        cipher = AES.new(self.aes_key, AES.MODE_CBC, self.aes_iv)
+    async def decrypt(self, encrypted_text: str) -> str:
+        cipher = Cipher(algorithms.AES(self.aes_key), modes.CBC(self.aes_iv))
+        decryptor = cipher.decryptor()
         raw = b64decode(encrypted_text.replace(" ", "+"))
-        decrypted = cipher.decrypt(raw)
-        return (await self._unpad(decrypted)).decode('utf-8')
+        pt_padded = decryptor.update(raw) + decryptor.finalize()
+        pt = await self._unpad(pt_padded)
+        return pt.decode("utf-8")
 
-    async def _get_timestamp(self):
-        return format(time.time(), '.6f')  # Seconds with 6 decimal places
+    async def _get_timestamp(self) -> str:
+        return format(time.time(), ".6f")  # seconds with 6 decimal places
 
-    async def getToken(self):
-        return await self.encrypt(self._token + '@' + await self._get_timestamp())
+    async def getToken(self) -> str:
+        return await self.encrypt(self._token + "@" + await self._get_timestamp())
 
-    async def decodeLoginToken(self, login_token):
+    async def decodeLoginToken(self, login_token: str):
         self.resetEncryption()
 
         decrypted = await self.decrypt(login_token)
-        parts = decrypted.split('@')
+        parts = decrypted.split("@")
 
         if len(parts) >= 1:
             self._token = parts[0]
@@ -52,6 +58,6 @@ class APIEncryption:
             self.userid = parts[1]
             self.uid = await self.encrypt(parts[1])
         if len(parts) >= 3:
-            self.aes_key = parts[2].encode()
+            self.aes_key = parts[2].encode()  # ensure 16/24/32 bytes
         if len(parts) >= 4:
-            self.aes_iv = parts[3].encode()
+            self.aes_iv = parts[3].encode()   # ensure 16 bytes

@@ -1,5 +1,3 @@
-import logging
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -19,10 +17,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import PERCENTAGE
 
-from .const import DOMAIN
+from .const import DOMAIN, _LOGGER
 from .coordinator import NeakasaCoordinator
-
-_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(
     hass: HomeAssistant,
