@@ -33,7 +33,7 @@ async def async_setup_entry(
     # This maybe different in your specific case, depending on how your data is structured
     sensors = [
         NeakasaSensor(coordinator, device_info, translation="sand_percent", key="sandLevelPercent", unit=PERCENTAGE),
-        NeakasaSensor(coordinator, device_info, translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, category=EntityCategory.DIAGNOSTIC, icon="mdi:wifi"),
+      #  NeakasaSensor(coordinator, device_info, translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, category=EntityCategory.DIAGNOSTIC, icon="mdi:wifi"),
         NeakasaSensor(coordinator, device_info, translation="stay_time", key="stayTime", unit=UnitOfTime.SECONDS, visible=False),
         NeakasaTimestampSensor(coordinator, device_info, translation="last_usage", key="lastUse"),
         NeakasaMapSensor(coordinator, device_info, translation="current_status", key="bucketStatus", options=['idle', 'cleaning', 'cleaning', 'leveling', 'flipover', 'cat_present', 'paused', 'side_bin_locking_panels_missing', None, 'cleaning_interrupted'], icon="mdi:state-machine"),

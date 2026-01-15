@@ -24,19 +24,19 @@ class NeakasaAPIData:
     """Class to hold api data."""
 
     binFullWaitReset: bool
-    cleanCfg: dict[str, Any]
+   # cleanCfg: dict[str, Any]
     sandLevelState: int
     sandLevelPercent: int
     bucketStatus: int
     room_of_bin: int
-    youngCatMode: bool
-    childLockOnOff: bool
-    autoBury: bool
-    autoLevel: bool
-    silentMode: bool
-    wifiRssi: int
-    autoForceInit: bool
-    bIntrptRangeDet: bool
+   # youngCatMode: bool
+   # childLockOnOff: bool
+   # autoBury: bool
+   # autoLevel: bool
+   # silentMode: bool
+   # wifiRssi: int
+   # autoForceInit: bool
+   # bIntrptRangeDet: bool
     stayTime: int
     lastUse: int
     cat_list: list[object] = field(default_factory=list)
@@ -148,16 +148,16 @@ class NeakasaCoordinator(DataUpdateCoordinator):
             try:
                 return NeakasaAPIData(
                     binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
-                    cleanCfg=devicedata['cleanCfg']['value'],
-                    youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
-                    childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
-                    autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
-                    autoLevel=devicedata['autoLevel']['value'] == 1, #-> automatische Nivellierung
-                    silentMode=devicedata['silentMode']['value'] == 1, #-> Stiller Modus
-                    autoForceInit=devicedata['autoForceInit']['value'] == 1, #-> automatische Wiederherstellung
-                    bIntrptRangeDet=devicedata['bIntrptRangeDet']['value'] == 1, #-> Unaufhaltsamer Kreislauf
+                   # cleanCfg=devicedata['cleanCfg']['value'],
+                   # youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
+                   # childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
+                   # autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
+                   # autoLevel=devicedata['autoLevel']['value'] == 1, #-> automatische Nivellierung
+                   # silentMode=devicedata['silentMode']['value'] == 1, #-> Stiller Modus
+                   # autoForceInit=devicedata['autoForceInit']['value'] == 1, #-> automatische Wiederherstellung
+                   # bIntrptRangeDet=devicedata['bIntrptRangeDet']['value'] == 1, #-> Unaufhaltsamer Kreislauf
                     sandLevelPercent=devicedata['Sand']['value']['percent'], #-> Katzenstreu Prozent
-                    wifiRssi=devicedata['NetWorkStatus']['value']['WiFi_RSSI'], #-> WLAN RSSI
+                   # wifiRssi=devicedata['NetWorkStatus']['value']['WiFi_RSSI'], #-> WLAN RSSI
                     bucketStatus=devicedata['bucketStatus']['value'], #-> Aktueller Status [0=Leerlauf,2=Reinigung,3=Nivellierung]
                     room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
                     sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
